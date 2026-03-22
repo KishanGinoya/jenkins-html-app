@@ -20,6 +20,13 @@ pipeline {
                 sh 'docker run -d -p 8081:80 my-nginx-app'
             }
         }
+stage('Debug Docker') {
+    steps {
+        sh 'whoami'
+        sh 'groups'
+        sh 'docker ps'
+    }
+}
 
     }
 }

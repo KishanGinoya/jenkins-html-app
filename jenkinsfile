@@ -16,10 +16,14 @@ pipeline {
         }
 
         stage('Run Container') {
-            steps {
-                sh 'docker run -d -p 8081:80 my-nginx-app'
-            }
-        }
+    steps {
+        sh '''
+        docker stop my-container || true
+        docker rm my-container || true
+        docker run -d -p 8081:80 --name my-container my-nginx-app
+        '''
+    }
+}
 stage('Debug Docker') {
     steps {
         sh 'whoami'

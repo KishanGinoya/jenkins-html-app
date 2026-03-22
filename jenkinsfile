@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/KishanGinoya/jenkins-html-app.git'
-            }
-        }
-
         stage('Show Files') {
             steps {
                 sh 'ls'

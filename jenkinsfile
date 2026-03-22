@@ -9,9 +9,15 @@ pipeline {
             }
         }
 
-        stage('Read HTML') {
+        stage('Docker Build') {
             steps {
-                sh 'cat index.html'
+                sh 'docker build -t my-nginx-app .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'docker run -d -p 8081:80 my-nginx-app'
             }
         }
 

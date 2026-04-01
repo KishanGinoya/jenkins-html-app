@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     environment {
         DOCKER_USER = "YOUR_DOCKERHUB_USERNAME"
         IMAGE_NAME = "jenkins-demo"

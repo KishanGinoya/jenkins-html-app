@@ -1,36 +1,36 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_USER = "YOUR_DOCKERHUB_USERNAME"
+        IMAGE_NAME = "jenkins-demo"
+    }
+
     stages {
 
-        stage('Show Files') {
+        stage('Build Image') {
             steps {
-                sh 'ls'
+                sh 'docker build -t $DOCKER_USER/$IMAGE_NAME .'
             }
         }
 
-        stage('Docker Build') {
+        stage('Login to DockerHub') {
             steps {
-                sh 'docker build -t my-nginx-app .'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                }
             }
         }
 
-        stage('Run Container') {
-    steps {
-        sh '''
-        docker stop my-container || true
-        docker rm my-container || true
-        docker run -d -p 8081:80 --name my-container my-nginx-app
-        '''
-    }
-}
-stage('Debug Docker') {
-    steps {
-        sh 'whoami'
-        sh 'groups'
-        sh 'docker ps'
-    }
-}
+        stage('Push Image') {
+            steps {
+                sh 'docker push $DOCKER_USER/$IMAGE_NAME'
+            }
+        }
 
     }
 }

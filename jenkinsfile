@@ -1,33 +1,35 @@
 pipeline {
     agent any
+
     environment {
         DOCKER_USER = "kishanginoya"
         IMAGE_NAME = "jenkins-demo"
+        CONTAINER_NAME = "my-container"
     }
 
     stages {
 
-        stage('Build Image') {
+        stage('Pull Image from DockerHub') {
             steps {
-                sh 'docker build -t $DOCKER_USER/$IMAGE_NAME .'
+                sh 'docker pull $DOCKER_USER/$IMAGE_NAME'
             }
         }
 
-        stage('Login to DockerHub') {
+        stage('Stop Old Container') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-cred',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
-                }
+                sh 'docker stop $CONTAINER_NAME || true'
             }
         }
 
-        stage('Push Image') {
+        stage('Remove Old Container') {
             steps {
-                sh 'docker push $DOCKER_USER/$IMAGE_NAME'
+                sh 'docker rm $CONTAINER_NAME || true'
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
+                sh 'docker run -d -p 8082:80 --name $CONTAINER_NAME $DOCKER_USER/$IMAGE_NAME'
             }
         }
 
